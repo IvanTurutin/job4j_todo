@@ -10,7 +10,7 @@
 Приложение реализовано на основе паттерна MVC. Имеет три слоя Controller, Service, Persistence.
 
 ### Применяемые технологии: 
-- .
+- Spring boot 2.7.4, Thymeleaf, Bootstrap 4, Hibernate 555.6.11, PostgreSql 12.
 
 ### Требования к окружению: 
 - Java 17;
