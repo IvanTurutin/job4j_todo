@@ -37,6 +37,11 @@ public class HbmTaskRepository implements TaskRepository {
             "UPDATE %s SET name = :%s description = :%s done = :%s WHERE id = :%s",
             TASK_MODEL, NAME, DESCRIPTION, DONE, ID
     );
+    public static final String UPDATE_DONE_STATEMENT = String.format(
+            "UPDATE %s done = :%s WHERE id = :%s",
+            TASK_MODEL, DONE, ID
+    );
+
     public static final String DELETE_STATEMENT = String.format(
             "DELETE %s WHERE id = :%s",
             TASK_MODEL, ID
@@ -44,6 +49,7 @@ public class HbmTaskRepository implements TaskRepository {
     public static final String FIND_ALL_STATEMENT = String.format("from %s", TASK_MODEL);
     public static final String FIND_ALL_ORDER_BY_ID_STATEMENT = FIND_ALL_STATEMENT + " order by id";
     public static final String FIND_BY_ID_STATEMENT = FIND_ALL_STATEMENT + String.format(" where id = :%s", ID);
+    public static final String FIND_BY_DONE_STATEMENT = FIND_ALL_STATEMENT + String.format(" where done = :%s", DONE);
 
     /**
      * Добавляет задачу в репозиторий и назначает ей id
@@ -125,6 +131,8 @@ public class HbmTaskRepository implements TaskRepository {
             session.beginTransaction();
             session.createQuery(UPDATE_STATEMENT)
                     .setParameter(NAME, task.getName())
+                    .setParameter(DESCRIPTION, task.getDescription())
+                    .setParameter(DONE, task.isDone())
                     .setParameter(ID, task.getId())
                     .executeUpdate();
             session.getTransaction().commit();
@@ -160,5 +168,55 @@ public class HbmTaskRepository implements TaskRepository {
             session.close();
         }
         return Optional.empty();
+    }
+
+    /**
+     * Обновляет статус задачи
+     * @param task задача, которую требуется изменить
+     * @return true если задача обновлена, false если не обновлена
+     */
+    @Override
+    public boolean updateDone(Task task) {
+        boolean replace = false;
+        Session session = sf.openSession();
+        try {
+            session.beginTransaction();
+            session.createQuery(UPDATE_DONE_STATEMENT)
+                    .setParameter(DONE, task.isDone())
+                    .setParameter(ID, task.getId())
+                    .executeUpdate();
+            session.getTransaction().commit();
+            replace = true;
+        } catch (Exception e) {
+            LOG.error(LOG_MESSAGE, e);
+            session.getTransaction().rollback();
+        } finally {
+            session.close();
+        }
+        return replace;
+    }
+
+    /**
+     * Ищет задачи в которых поле done соответствует аргументу
+     * @param isDone аргумент, по которому определяется какие задачи требуется искать true - выполненные,
+     *               false - не выполненные
+     * @return список задач соответствующих запросу
+     */
+    @Override
+    public List<Task> findByDone(boolean isDone) {
+        Session session = sf.openSession();
+        try {
+            session.beginTransaction();
+            Query<Task> query = session.createQuery(FIND_BY_DONE_STATEMENT, Task.class);
+            query.setParameter(DONE, isDone);
+            session.getTransaction().commit();
+            return query.list();
+        } catch (Exception e) {
+            LOG.error(LOG_MESSAGE, e);
+            session.getTransaction().rollback();
+        } finally {
+            session.close();
+        }
+        return new ArrayList<>();
     }
 }

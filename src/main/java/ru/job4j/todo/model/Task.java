@@ -33,7 +33,7 @@ public class Task {
      */
     private LocalDateTime created = LocalDateTime.now().withNano(3);
     /**
-     * Индикатор выполнения задачи
+     * Статус выполнения задачи
      */
     private boolean done;
 }

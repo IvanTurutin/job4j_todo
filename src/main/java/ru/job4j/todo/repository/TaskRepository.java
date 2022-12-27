@@ -44,4 +44,19 @@ public interface TaskRepository {
      * @return задачу обернутую в Optional если задача удалена, и Optional.empty() если не удалена
      */
     Optional<Task> delete(Task task);
+
+    /**
+     * Обновляет статус задачи
+     * @param task задача, которую требуется изменить
+     * @return true если задача обновлена, false если не обновлена
+     */
+    boolean updateDone(Task task);
+
+    /**
+     * Ищет задачи в которых поле done соответствует аргументу
+     * @param isDone аргумент, по которому определяется какие задачи требуется искать true - выполненные,
+     *               false - не выполненные
+     * @return список задач соответствующих запросу
+     */
+    List<Task> findByDone(boolean isDone);
 }
