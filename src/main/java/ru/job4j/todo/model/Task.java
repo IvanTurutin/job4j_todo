@@ -1,17 +1,19 @@
 package ru.job4j.todo.model;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
  * Модель данных Task (задача)
  */
 @Entity
 @Table(name = "tasks")
-@Data
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Task {
 
     /**
@@ -19,6 +21,7 @@ public class Task {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private int id;
     /**
      * Название задачи
@@ -31,9 +34,10 @@ public class Task {
     /**
      * Время создания задачи
      */
-    private LocalDateTime created = LocalDateTime.now().withNano(3);
+    private LocalDateTime created = LocalDateTime.now().withNano(0);
     /**
      * Статус выполнения задачи
      */
     private boolean done;
+
 }

@@ -1,6 +1,5 @@
 package ru.job4j.todo.repository;
 
-import lombok.AllArgsConstructor;
 import net.jcip.annotations.ThreadSafe;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -19,7 +18,7 @@ import java.util.Optional;
  * @see ru.job4j.todo.model.Task
  */
 @ThreadSafe
-@AllArgsConstructor
+//@AllArgsConstructor
 @Repository
 public class HbmTaskRepository implements TaskRepository {
 
@@ -28,17 +27,17 @@ public class HbmTaskRepository implements TaskRepository {
     private static final Logger LOG = LoggerFactory.getLogger(HbmTaskRepository.class.getName());
     private static final String LOG_MESSAGE = "Exception in UserRepository";
 
-    public static final String TASK_MODEL = "Item";
+    public static final String TASK_MODEL = "Task";
     public static final String NAME = "fName";
     public static final String DESCRIPTION = "fDescription";
     public static final String DONE = "fDone";
     public static final String ID = "fID";
     public static final String UPDATE_STATEMENT = String.format(
-            "UPDATE %s SET name = :%s description = :%s done = :%s WHERE id = :%s",
+            "UPDATE %s SET name = :%s, description = :%s, done = :%s WHERE id = :%s",
             TASK_MODEL, NAME, DESCRIPTION, DONE, ID
     );
     public static final String UPDATE_DONE_STATEMENT = String.format(
-            "UPDATE %s done = :%s WHERE id = :%s",
+            "UPDATE %s SET done = :%s WHERE id = :%s",
             TASK_MODEL, DONE, ID
     );
 
@@ -50,6 +49,12 @@ public class HbmTaskRepository implements TaskRepository {
     public static final String FIND_ALL_ORDER_BY_ID_STATEMENT = FIND_ALL_STATEMENT + " order by id";
     public static final String FIND_BY_ID_STATEMENT = FIND_ALL_STATEMENT + String.format(" where id = :%s", ID);
     public static final String FIND_BY_DONE_STATEMENT = FIND_ALL_STATEMENT + String.format(" where done = :%s", DONE);
+
+    public static final String TRUNCATE_TABLE = "DELETE FROM tasks";
+
+    public HbmTaskRepository(SessionFactory sf) {
+        this.sf = sf;
+    }
 
     /**
      * Добавляет задачу в репозиторий и назначает ей id
@@ -219,4 +224,20 @@ public class HbmTaskRepository implements TaskRepository {
         }
         return new ArrayList<>();
     }
+
+    public void truncateTable() {
+        Session session = sf.openSession();
+        try {
+            session = sf.openSession();
+            session.beginTransaction();
+            session.createSQLQuery(TRUNCATE_TABLE).executeUpdate();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            LOG.error("Exception in UserRepository", e);
+            session.getTransaction().rollback();
+        } finally {
+            session.close();
+        }
+    }
+
 }
