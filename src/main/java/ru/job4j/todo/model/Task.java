@@ -38,6 +38,6 @@ public class Task {
     /**
      * Статус выполнения задачи
      */
-    private boolean done;
+    private boolean done = false;
 
 }

@@ -1,7 +1,6 @@
 package ru.job4j.todo.service;
 
 import net.jcip.annotations.ThreadSafe;
-import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Service;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.repository.TaskRepository;
@@ -69,7 +68,7 @@ public class SimpleTaskService implements TaskService {
      */
     @Override
     public Optional<Task> delete(Task task) {
-        return Optional.empty();
+        return repository.delete(task);
     }
 
     /**

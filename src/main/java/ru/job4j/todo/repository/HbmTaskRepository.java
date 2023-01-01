@@ -225,6 +225,9 @@ public class HbmTaskRepository implements TaskRepository {
         return new ArrayList<>();
     }
 
+    /**
+     * Очищает таблицу от записей
+     */
     public void truncateTable() {
         Session session = sf.openSession();
         try {
@@ -233,7 +236,7 @@ public class HbmTaskRepository implements TaskRepository {
             session.createSQLQuery(TRUNCATE_TABLE).executeUpdate();
             session.getTransaction().commit();
         } catch (Exception e) {
-            LOG.error("Exception in UserRepository", e);
+            LOG.error(LOG_MESSAGE, e);
             session.getTransaction().rollback();
         } finally {
             session.close();
