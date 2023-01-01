@@ -18,7 +18,6 @@ import java.util.Optional;
  * @see ru.job4j.todo.model.Task
  */
 @ThreadSafe
-//@AllArgsConstructor
 @Repository
 public class HbmTaskRepository implements TaskRepository {
 
