@@ -27,14 +27,8 @@ public class HbmTaskRepository implements TaskRepository {
     private static final String LOG_MESSAGE = "Exception in UserRepository";
 
     public static final String TASK_MODEL = "Task";
-    public static final String NAME = "fName";
-    public static final String DESCRIPTION = "fDescription";
     public static final String DONE = "fDone";
     public static final String ID = "fID";
-    public static final String UPDATE_STATEMENT = String.format(
-            "UPDATE %s SET name = :%s, description = :%s, done = :%s WHERE id = :%s",
-            TASK_MODEL, NAME, DESCRIPTION, DONE, ID
-    );
     public static final String UPDATE_DONE_STATEMENT = String.format(
             "UPDATE %s SET done = :%s WHERE id = :%s",
             TASK_MODEL, DONE, ID
@@ -133,12 +127,7 @@ public class HbmTaskRepository implements TaskRepository {
         Session session = sf.openSession();
         try {
             session.beginTransaction();
-            session.createQuery(UPDATE_STATEMENT)
-                    .setParameter(NAME, task.getName())
-                    .setParameter(DESCRIPTION, task.getDescription())
-                    .setParameter(DONE, task.isDone())
-                    .setParameter(ID, task.getId())
-                    .executeUpdate();
+            session.merge(task);
             session.getTransaction().commit();
             replace = true;
         } catch (Exception e) {

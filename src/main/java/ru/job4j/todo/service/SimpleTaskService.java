@@ -58,6 +58,9 @@ public class SimpleTaskService implements TaskService {
      */
     @Override
     public boolean update(Task task) {
+        if (repository.findById(task.getId()).isEmpty()) {
+            return false;
+        }
         return repository.update(task);
     }
 
@@ -68,6 +71,9 @@ public class SimpleTaskService implements TaskService {
      */
     @Override
     public Optional<Task> delete(Task task) {
+        if (repository.findById(task.getId()).isEmpty()) {
+            return Optional.empty();
+        }
         return repository.delete(task);
     }
 
@@ -78,6 +84,9 @@ public class SimpleTaskService implements TaskService {
      */
     @Override
     public boolean updateDone(Task task) {
+        if (repository.findById(task.getId()).isEmpty()) {
+            return false;
+        }
         return repository.updateDone(task);
     }
 

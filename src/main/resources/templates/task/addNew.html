@@ -26,12 +26,11 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-item nav-link" th:href="@{/index}">Главная</a>
+                <a class="nav-item nav-link active" th:href="@{/index}">Все<span class="sr-only">(current)</span></a>
+                <a class="nav-item nav-link active" th:href="@{|/tasks/done/true|}">Выполненные</a>
+                <a class="nav-item nav-link active" th:href="@{|/tasks/done/false|}">Новые</a>
 <!--
-                <a class="nav-item nav-link" th:href="@{/posts}">Вакансии</a>
-                <a class="nav-item nav-link" th:href="@{/candidates}">Кандидаты</a>
-                <a class="nav-item nav-link" th:href="@{/formAddCandidate}">Добавить кандидата</a>
-                <a class="nav-item nav-link active" href="#">Редактировать кандидата<span class="sr-only">(current)</span></a>
+                <a class="nav-item nav-link active" href="#">Регистрация<span class="sr-only">(current)</span></a>
                 <a class="nav-item nav-link" th:if="${user.email == 'Гость'}" th:href="@{/loginPage}">
                     <span th:text="${user.email}"></span>
                     <span> | Войти</span>
@@ -41,51 +40,27 @@
                     <span> | Выйти</span>
                 </a>
 -->
-
             </div>
         </div>
     </nav>
     <div class="row pt-3">
         <div class="card" style="width: 100%">
             <div class="card-header">
-                Информация о задаче.
+                Новая задача.
             </div>
             <div class="card-body">
-                <form th:action="@{/formUpdateTask}">
+                <form th:action="@{/tasks/add}" method="POST">
+                    <input type="hidden" name="id" value="0"/>
                     <div class="form-group">
-                        <h6 class="card-subtitle mb-2">
-                            <span>Задача: </span>
-                            <span th:text="${session.task.name}"></span>
-                        </h6>
-                        <h6 class="card-subtitle mb-2">
-                            <span>Описание: </span>
-                            <span th:text="${session.task.description}"></span>
-                        </h6>
-                        <h6 class="card-subtitle mb-2">
-                            <span>Время создания: </span>
-                            <span th:text="${session.task.created}"></span>
-                        </h6>
-                        <h6 class="card-subtitle mb-2">
-                            <span>Статус: </span>
-                            <span th:if="${session.task.done}">
-                                Выполнена
-                            </span>
-                            <span th:if="${!session.task.done}">
-                                Не выполнена
-                            </span>
-                        </h6>
+                        <label for="name">Название задачи</label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Введите название">
                     </div>
-                    <button type="submit" class="btn btn-primary">Редактировать</button>
-                </form>
-            </div>
-            <div class="card-body">
-                <form th:action="@{/taskIsDone}" method="POST">
-                    <button type="submit" class="btn btn-primary">Задача выполнена</button>
-                </form>
-            </div>
-            <div class="card-body" >
-                <form th:action="@{/deleteTask}" method="POST">
-                    <button type="submit" class="btn btn-primary">Удалить задачу</button>
+
+                    <div class="form-group">
+                        <label for="description">Описание задачи</label>
+                        <input type="text" class="form-control" id="description" name="description" placeholder="Введите описание задачи">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Добавить</button>
                 </form>
             </div>
         </div>

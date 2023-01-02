@@ -29,8 +29,8 @@
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
                 <a class="nav-item nav-link active" th:href="@{/index}">Все<span class="sr-only">(current)</span></a>
-                <a class="nav-item nav-link active" th:href="@{|/doneTasks/true|}">Выполненные</a>
-                <a class="nav-item nav-link active" th:href="@{|/doneTasks/false|}">Новые</a>
+                <a class="nav-item nav-link active" th:href="@{|/tasks/done/true|}">Выполненные</a>
+                <a class="nav-item nav-link active" th:href="@{|/tasks/done/false|}">Новые</a>
 <!--
                 <a class="nav-item nav-link" th:if="${user.email == 'Гость'}" th:href="@{/loginPage}">
                     <span th:text="${user.email}"></span>
@@ -58,7 +58,7 @@
             <tr th:each="task: ${tasks}">
                 <td th:text="${task.id}" />
                 <td>
-                    <a th:href="@{|/formShowTask/${task.id}|}">
+                    <a th:href="@{|/tasks/formShow/${task.id}|}">
                         <span th:text="${task.name}"></span>
                     </a>
                 </td>
@@ -75,7 +75,7 @@
             </tbody>
         </table>
         <div class="card-body">
-            <form th:action="@{/newTask}">
+            <form th:action="@{/tasks/new}">
                 <button type="submit" class="btn btn-primary">Добавить задачу</button>
             </form>
         </div>
