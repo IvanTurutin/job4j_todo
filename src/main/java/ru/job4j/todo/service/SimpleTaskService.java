@@ -66,28 +66,32 @@ public class SimpleTaskService implements TaskService {
 
     /**
      * Обрабатывает запрос при удалении задачи
-     * @param task задача, которую необходимо удалить
+     * @param id идентификатор задачи, которую необходимо удалить
      * @return задачу обернутую в Optional если задача удалена, и Optional.empty() если не удалена
      */
     @Override
-    public Optional<Task> delete(Task task) {
-        if (repository.findById(task.getId()).isEmpty()) {
-            return Optional.empty();
+    public boolean delete(int id) {
+        Optional<Task> optionalTask = repository.findById(id);
+        if (optionalTask.isEmpty()) {
+            return false;
         }
-        return repository.delete(task);
+        repository.delete(optionalTask.get());
+        return true;
     }
 
     /**
      * Обрабатывает запрос при обновлении статуса задачи
-     * @param task задача, которую требуется изменить
+     * @param id идентификатор задачи, которую требуется изменить
      * @return true если задача обновлена, false если не обновлена
      */
     @Override
-    public boolean updateDone(Task task) {
-        if (repository.findById(task.getId()).isEmpty()) {
+    public boolean updateDone(int id) {
+        Optional<Task> optionalTask = repository.findById(id);
+        if (optionalTask.isEmpty()) {
             return false;
         }
-        return repository.updateDone(task);
+        optionalTask.get().setDone(true);
+        return repository.updateDone(optionalTask.get());
     }
 
     /**

@@ -47,9 +47,6 @@
             </div>
             <div class="card-body">
                 <form th:action="@{/tasks/update}" method="POST" th:object="${task}" enctype="multipart/form-data">
-<!--
-                    <input type="hidden" name="id" th:value="${session.task.id}"/>
--->
                     <input type="hidden" name="id" th:field="*{id}"/>
                     <input type="hidden" name="created" th:field="*{created}"/>
                     <div class="form-group">

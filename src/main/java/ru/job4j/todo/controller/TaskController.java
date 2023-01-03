@@ -40,7 +40,7 @@ public class TaskController {
             model.addAttribute("message", "Такая задача не найдена.");
             return "message/fail";
         }
-        session.setAttribute("task", task.get());
+        model.addAttribute("task", task.get());
         return "task/show";
     }
 
@@ -88,16 +88,16 @@ public class TaskController {
 
     /**
      * Обрабатывает запрос на формирование вида для редактирования задачи
-     * @param session сессия подключения
      * @param model модель вида
+     * @param id идентификатор задачи
      * @return название шаблона вида для редактирования задачи
      */
-    @GetMapping("/formUpdate")
-    public String formUpdateTask(HttpSession session, Model model) {
+    @GetMapping("/formUpdate/{id}")
+    public String formUpdateTask(Model model, @PathVariable("id") int id) {
 /*
         model.addAttribute("user", ControllerUtility.checkUser(session));
 */
-        model.addAttribute("task", session.getAttribute("task"));
+        model.addAttribute("task", taskService.findById(id));
         return "task/update";
     }
 
@@ -121,17 +121,14 @@ public class TaskController {
 
     /**
      * Обработка запроса на изменение статуса
-     * @param session сессия подключения
      * @param model модель вида
+     * @param id идентификатор задачи
      * @return если задача не обновлена перенаправляет на страницу с выводом ошибки, если задача обновлена - перенаправляет
      * на страницу, сообщающую об успешном обновлении задачи
      */
-    @PostMapping("/isDone")
-    public String taskIsDone(HttpSession session, Model model) {
-        Task sessionTask = (Task) session.getAttribute("task");
-        sessionTask.setDone(true);
-        boolean isDone = taskService.updateDone(sessionTask);
-        if (!isDone) {
+    @PostMapping("/isDone/{id}")
+    public String taskIsDone(Model model, @PathVariable("id") int id) {
+        if (!taskService.updateDone(id)) {
             model.addAttribute("message", "Не удалось обновить задачу.");
             return "message/fail";
         }
@@ -141,22 +138,18 @@ public class TaskController {
 
     /**
      * Обрабатывает запрос на удаление задачи
-     * @param session сессия подключения
      * @param model модель вида
+     * @param id идентификатор задачи
      * @return если задача не удалена - перенаправляет на страницу с выводом ошибки, если задача обновлена - перенаправляет
      * на страницу, сообщающую об успешном удалении задачи
      */
-    @PostMapping("/delete")
-    public String deleteTask(HttpSession session, Model model) {
-        Task sessionTask = (Task) session.getAttribute("task");
-        Optional<Task> deleted = taskService.delete(sessionTask);
-        if (deleted.isEmpty()) {
+    @PostMapping("/delete/{id}")
+    public String deleteTask(Model model, @PathVariable("id") int id) {
+        if (!taskService.delete(id)) {
             model.addAttribute("message", "Не удалось удалить задачу.");
             return "message/fail";
         }
         model.addAttribute("message", "Задача успешно удалена.");
         return "message/success";
     }
-
-
 }

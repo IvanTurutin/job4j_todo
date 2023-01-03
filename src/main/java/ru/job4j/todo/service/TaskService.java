@@ -39,17 +39,17 @@ public interface TaskService {
 
     /**
      * Обрабатывает запрос при удалении задачи
-     * @param task задача, которую необходимо удалить
+     * @param id идентификатор задачи, которую необходимо удалить
      * @return задачу обернутую в Optional если задача удалена, и Optional.empty() если не удалена
      */
-    Optional<Task> delete(Task task);
+    boolean delete(int id);
 
     /**
      * Обрабатывает запрос при обновлении статуса задачи
-     * @param task задача, которую требуется изменить
+     * @param id идентификатор задачи, которую требуется изменить
      * @return true если задача обновлена, false если не обновлена
      */
-    boolean updateDone(Task task);
+    boolean updateDone(int id);
 
     /**
      * Обрабатывает запрос при поиске задач в которых поле done соответствует аргументу

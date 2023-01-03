@@ -51,26 +51,26 @@
                 Информация о задаче.
             </div>
             <div class="card-body">
-                <form th:action="@{/tasks/formUpdate}">
+                <form th:action="@{|/tasks/formUpdate/${task.id}|}">
                     <div class="form-group">
                         <h6 class="card-subtitle mb-2">
                             <span>Задача: </span>
-                            <span th:text="${session.task.name}"></span>
+                            <span th:text="${task.name}"></span>
                         </h6>
                         <h6 class="card-subtitle mb-2">
                             <span>Описание: </span>
-                            <span th:text="${session.task.description}"></span>
+                            <span th:text="${task.description}"></span>
                         </h6>
                         <h6 class="card-subtitle mb-2">
                             <span>Время создания: </span>
-                            <span th:text="${session.task.created}"></span>
+                            <span th:text="${task.created}"></span>
                         </h6>
                         <h6 class="card-subtitle mb-2">
                             <span>Статус: </span>
-                            <span th:if="${session.task.done}">
+                            <span th:if="${task.done}">
                                 Выполнена
                             </span>
-                            <span th:if="${!session.task.done}">
+                            <span th:if="${!task.done}">
                                 Не выполнена
                             </span>
                         </h6>
@@ -79,12 +79,12 @@
                 </form>
             </div>
             <div class="card-body">
-                <form th:action="@{/tasks/isDone}" method="POST">
+                <form th:action="@{|/tasks/isDone/${task.id}|}" method="POST">
                     <button type="submit" class="btn btn-primary">Задача выполнена</button>
                 </form>
             </div>
             <div class="card-body" >
-                <form th:action="@{/tasks/delete}" method="POST">
+                <form th:action="@{|/tasks/delete/${task.id}|}" method="POST">
                     <button type="submit" class="btn btn-primary">Удалить задачу</button>
                 </form>
             </div>
