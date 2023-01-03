@@ -29,17 +29,14 @@
                 <a class="nav-item nav-link active" th:href="@{/index}">Все<span class="sr-only">(current)</span></a>
                 <a class="nav-item nav-link active" th:href="@{|/tasks/done/true|}">Выполненные</a>
                 <a class="nav-item nav-link active" th:href="@{|/tasks/done/false|}">Новые</a>
-<!--
-                <a class="nav-item nav-link active" href="#">Регистрация<span class="sr-only">(current)</span></a>
-                <a class="nav-item nav-link" th:if="${user.email == 'Гость'}" th:href="@{/loginPage}">
-                    <span th:text="${user.email}"></span>
+                <a class="nav-item nav-link" th:if="${user.name == 'Гость'}" th:href="@{/users/loginPage}">
+                    <span th:text="${user.name}"></span>
                     <span> | Войти</span>
                 </a>
-                <a class="nav-item nav-link" th:if="${user.email != 'Гость'}" th:href="@{/logout}">
-                    <span th:text="${user.email}"></span>
+                <a class="nav-item nav-link" th:if="${user.name != 'Гость'}" th:href="@{/users/logout}">
+                    <span th:text="${user.name}"></span>
                     <span> | Выйти</span>
                 </a>
--->
             </div>
         </div>
     </nav>
