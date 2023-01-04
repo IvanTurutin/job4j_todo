@@ -67,16 +67,13 @@ public class SimpleTaskService implements TaskService {
     /**
      * Обрабатывает запрос при удалении задачи
      * @param id идентификатор задачи, которую необходимо удалить
-     * @return задачу обернутую в Optional если задача удалена, и Optional.empty() если не удалена
+     * @return true если задача удалена, и false если не удалена
      */
     @Override
     public boolean delete(int id) {
         Optional<Task> optionalTask = repository.findById(id);
-        if (optionalTask.isEmpty()) {
-            return false;
-        }
-        repository.delete(optionalTask.get());
-        return true;
+        optionalTask.ifPresent(repository::delete);
+        return optionalTask.isPresent();
     }
 
     /**
