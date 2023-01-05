@@ -1,18 +1,13 @@
 package ru.job4j.todo.repository;
 
-import org.hibernate.SessionFactory;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.job4j.todo.Main;
 import ru.job4j.todo.model.Task;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +20,8 @@ class HbmTaskRepositoryTest {
 
     @BeforeAll
     public static void initStore() {
-        store = new HbmTaskRepository(new Main().sf());
+        CrudRepository cr = new SimpleCrudRepository(new Main().sf());
+        store = new HbmTaskRepository(cr);
         store.truncateTable();
     }
 

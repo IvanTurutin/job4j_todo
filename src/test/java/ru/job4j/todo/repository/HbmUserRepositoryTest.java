@@ -17,7 +17,8 @@ class HbmUserRepositoryTest {
 
     @BeforeAll
     public static void initStore() {
-        store = new HbmUserRepository(new Main().sf());
+        CrudRepository cr = new SimpleCrudRepository(new Main().sf());
+        store = new HbmUserRepository(cr);
         store.truncateTable();
     }
 
@@ -117,7 +118,7 @@ class HbmUserRepositoryTest {
     }
 
     @Test
-    void whenRepeatLogin() {
+    void whenDuplicateLogin() {
         User user = new User();
         user.setId(0);
         user.setName("user1");

@@ -1,17 +1,11 @@
 package ru.job4j.todo.repository;
 
+import lombok.AllArgsConstructor;
 import net.jcip.annotations.ThreadSafe;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import ru.job4j.todo.model.Task;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Репозиторий задач
@@ -19,35 +13,33 @@ import java.util.Optional;
  */
 @ThreadSafe
 @Repository
+@AllArgsConstructor
 public class HbmTaskRepository implements TaskRepository {
+    private final CrudRepository cr;
 
-    private final SessionFactory sf;
-
-    private static final Logger LOG = LoggerFactory.getLogger(HbmTaskRepository.class.getName());
-    private static final String LOG_MESSAGE = "Exception in UserRepository";
-
-    public static final String TASK_MODEL = "Task";
+    public static final String MODEL = "Task";
     public static final String DONE = "fDone";
     public static final String ID = "fID";
+    public static final String NAME = "fName";
+    public static final String DESCRIPTION = "fDescription";
     public static final String UPDATE_DONE_STATEMENT = String.format(
             "UPDATE %s SET done = :%s WHERE id = :%s",
-            TASK_MODEL, DONE, ID
+            MODEL, DONE, ID
+    );
+    public static final String UPDATE_STATEMENT = String.format(
+            "UPDATE %s SET name = :%s, description = :%s, done = :%s WHERE id = :%s",
+            MODEL, NAME, DESCRIPTION, DONE, ID
     );
 
     public static final String DELETE_STATEMENT = String.format(
             "DELETE %s WHERE id = :%s",
-            TASK_MODEL, ID
+            MODEL, ID
     );
-    public static final String FIND_ALL_STATEMENT = String.format("from %s", TASK_MODEL);
+    public static final String FIND_ALL_STATEMENT = String.format("from %s", MODEL);
     public static final String FIND_ALL_ORDER_BY_ID_STATEMENT = FIND_ALL_STATEMENT + " order by id";
     public static final String FIND_BY_ID_STATEMENT = FIND_ALL_STATEMENT + String.format(" where id = :%s", ID);
     public static final String FIND_BY_DONE_STATEMENT = FIND_ALL_STATEMENT + String.format(" where done = :%s", DONE);
-
-    public static final String TRUNCATE_TABLE = "DELETE FROM tasks";
-
-    public HbmTaskRepository(SessionFactory sf) {
-        this.sf = sf;
-    }
+    public static final String TRUNCATE_TABLE = String.format("DELETE FROM %s", MODEL);
 
     /**
      * Добавляет задачу в репозиторий и назначает ей id
@@ -57,19 +49,9 @@ public class HbmTaskRepository implements TaskRepository {
      */
     @Override
     public Optional<Task> add(Task task) {
-        Session session = sf.openSession();
-        try {
-            session.beginTransaction();
-            session.save(task);
-            session.getTransaction().commit();
-            return Optional.of(task);
-        } catch (Exception e) {
-            LOG.error(LOG_MESSAGE, e);
-            session.getTransaction().rollback();
-        } finally {
-            session.close();
-        }
-        return Optional.empty();
+        int id = task.getId();
+        cr.run(session -> session.persist(task));
+        return id == task.getId() ? Optional.empty() : Optional.of(task);
     }
 
     /**
@@ -79,20 +61,10 @@ public class HbmTaskRepository implements TaskRepository {
      */
     @Override
     public Optional<Task> findById(int id) {
-        Session session = sf.openSession();
-        try {
-            session.beginTransaction();
-            Query<Task> query = session.createQuery(FIND_BY_ID_STATEMENT, Task.class);
-            query.setParameter(ID, id);
-            session.getTransaction().commit();
-            return query.uniqueResultOptional();
-        } catch (Exception e) {
-            LOG.error(LOG_MESSAGE, e);
-            session.getTransaction().rollback();
-        } finally {
-            session.close();
-        }
-        return Optional.empty();
+        return cr.optional(
+                FIND_BY_ID_STATEMENT, Task.class,
+                Map.of(ID, id)
+        );
     }
 
     /**
@@ -101,19 +73,7 @@ public class HbmTaskRepository implements TaskRepository {
      */
     @Override
     public List<Task> findAll() {
-        Session session = sf.openSession();
-        try {
-            session.beginTransaction();
-            Query<Task> query = session.createQuery(FIND_ALL_ORDER_BY_ID_STATEMENT, Task.class);
-            session.getTransaction().commit();
-            return query.list();
-        } catch (Exception e) {
-            LOG.error(LOG_MESSAGE, e);
-            session.getTransaction().rollback();
-        } finally {
-            session.close();
-        }
-        return new ArrayList<>();
+        return cr.query(FIND_ALL_ORDER_BY_ID_STATEMENT, Task.class);
     }
 
     /**
@@ -123,20 +83,16 @@ public class HbmTaskRepository implements TaskRepository {
      */
     @Override
     public boolean update(Task task) {
-        boolean replace = false;
-        Session session = sf.openSession();
-        try {
-            session.beginTransaction();
-            session.merge(task);
-            session.getTransaction().commit();
-            replace = true;
-        } catch (Exception e) {
-            LOG.error(LOG_MESSAGE, e);
-            session.getTransaction().rollback();
-        } finally {
-            session.close();
-        }
-        return replace;
+
+        return  cr.query(
+                UPDATE_STATEMENT,
+                Map.of(
+                        NAME, task.getName(),
+                        DESCRIPTION, task.getDescription(),
+                        DONE, task.isDone(),
+                        ID, task.getId()
+                )
+        );
     }
 
     /**
@@ -146,21 +102,12 @@ public class HbmTaskRepository implements TaskRepository {
      */
     @Override
     public Optional<Task> delete(Task task) {
-        Session session = sf.openSession();
-        try {
-            session.beginTransaction();
-            session.createQuery(DELETE_STATEMENT)
-                    .setParameter(ID, task.getId())
-                    .executeUpdate();
-            session.getTransaction().commit();
-            return Optional.of(task);
-        } catch (Exception e) {
-            LOG.error(LOG_MESSAGE, e);
-            session.getTransaction().rollback();
-        } finally {
-            session.close();
-        }
-        return Optional.empty();
+        return cr.query(
+                DELETE_STATEMENT,
+                Map.of(ID, task.getId())
+        )
+                ? Optional.of(task)
+                : Optional.empty();
     }
 
     /**
@@ -170,23 +117,14 @@ public class HbmTaskRepository implements TaskRepository {
      */
     @Override
     public boolean updateDone(Task task) {
-        boolean replace = false;
-        Session session = sf.openSession();
-        try {
-            session.beginTransaction();
-            session.createQuery(UPDATE_DONE_STATEMENT)
-                    .setParameter(DONE, task.isDone())
-                    .setParameter(ID, task.getId())
-                    .executeUpdate();
-            session.getTransaction().commit();
-            replace = true;
-        } catch (Exception e) {
-            LOG.error(LOG_MESSAGE, e);
-            session.getTransaction().rollback();
-        } finally {
-            session.close();
-        }
-        return replace;
+
+        return cr.query(
+                UPDATE_DONE_STATEMENT,
+                Map.of(
+                        DONE, task.isDone(),
+                        ID, task.getId()
+                )
+        );
     }
 
     /**
@@ -197,38 +135,19 @@ public class HbmTaskRepository implements TaskRepository {
      */
     @Override
     public List<Task> findByDone(boolean isDone) {
-        Session session = sf.openSession();
-        try {
-            session.beginTransaction();
-            Query<Task> query = session.createQuery(FIND_BY_DONE_STATEMENT, Task.class);
-            query.setParameter(DONE, isDone);
-            session.getTransaction().commit();
-            return query.list();
-        } catch (Exception e) {
-            LOG.error(LOG_MESSAGE, e);
-            session.getTransaction().rollback();
-        } finally {
-            session.close();
-        }
-        return new ArrayList<>();
+
+        return cr.query(
+                FIND_BY_DONE_STATEMENT,
+                Task.class,
+                Map.of(DONE, isDone)
+        );
     }
 
     /**
      * Очищает таблицу от записей
      */
     public void truncateTable() {
-        Session session = sf.openSession();
-        try {
-            session = sf.openSession();
-            session.beginTransaction();
-            session.createSQLQuery(TRUNCATE_TABLE).executeUpdate();
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            LOG.error(LOG_MESSAGE, e);
-            session.getTransaction().rollback();
-        } finally {
-            session.close();
-        }
+        cr.run(TRUNCATE_TABLE, new HashMap<>());
     }
 
 }
