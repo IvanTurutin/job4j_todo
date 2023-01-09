@@ -40,4 +40,11 @@ public class Task {
      */
     private boolean done = false;
 
+    /**
+     * Пользователь, которому принадлежит эта задача
+     */
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
 }

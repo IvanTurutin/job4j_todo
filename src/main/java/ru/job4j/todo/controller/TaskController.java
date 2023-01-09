@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.job4j.todo.model.Task;
+import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.TaskService;
 import ru.job4j.todo.util.ControllerUtility;
 
@@ -83,7 +84,9 @@ public class TaskController {
      */
     @PostMapping("/add")
     public String registration(HttpSession session, Model model, @ModelAttribute Task task) {
-        model.addAttribute("user", ControllerUtility.checkUser(session));
+        User user = ControllerUtility.checkUser(session);
+        model.addAttribute("user", user);
+        task.setUser(user);
         Optional<Task> addedTask = taskService.add(task);
         if (addedTask.isEmpty()) {
             model.addAttribute("message", "Не удалось добавить новую задачу.");
@@ -117,7 +120,9 @@ public class TaskController {
      */
     @PostMapping("/update")
     public String updateTask(HttpSession session, Model model, @ModelAttribute Task task) {
-        model.addAttribute("user", ControllerUtility.checkUser(session));
+        User user = ControllerUtility.checkUser(session);
+        model.addAttribute("user", user);
+        task.setUser(user);
         boolean updatedTask = taskService.update(task);
         if (!updatedTask) {
             model.addAttribute("message", "Не удалось обновить задачу.");

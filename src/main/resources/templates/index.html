@@ -48,6 +48,7 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Задача</th>
+                <th scope="col">Пользователь</th>
                 <th scope="col">Время создания</th>
                 <th scope="col">Статус</th>
             </tr>
@@ -60,6 +61,7 @@
                         <span th:text="${task.name}"></span>
                     </a>
                 </td>
+                <td th:text="${task.user.name}" />
                 <td th:text="${task.created}" />
                 <td>
                     <span th:if="${task.done}">

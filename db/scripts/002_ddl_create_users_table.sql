@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS users
 (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR NOT NULL,
-  login VARCHAR NOT NULL UNIQUE,
-  password VARCHAR NOT NULL
+id SERIAL PRIMARY KEY,
+name VARCHAR NOT NULL,
+login VARCHAR NOT NULL UNIQUE,
+password VARCHAR NOT NULL
 );
 
 comment on table users is 'Пользователи';

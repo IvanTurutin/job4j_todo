@@ -85,7 +85,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.2.9</version>
+            <version>42.5.1</version>
         </dependency>
 
         <dependency>
@@ -122,8 +122,12 @@
             <version>2.1.214</version>
             <scope>test</scope>
         </dependency>
-
-
+<!--
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+        </dependency>
+-->
     </dependencies>
 
     <build>
