@@ -28,8 +28,8 @@ public class SimpleTaskService implements TaskService {
      * задачу не удалось
      */
     @Override
-    public Optional<Task> add(Task task) {
-        return repository.add(task);
+    public boolean add(Task task) {
+        return repository.add(task).isPresent();
     }
 
     /**

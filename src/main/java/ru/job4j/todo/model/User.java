@@ -33,6 +33,7 @@ public class User {
     /**
      * Логин пользователя
      */
+    @Column(unique = true)
     private String login;
 
     /**

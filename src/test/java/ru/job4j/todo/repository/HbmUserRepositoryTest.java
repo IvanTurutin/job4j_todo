@@ -18,6 +18,9 @@ class HbmUserRepositoryTest {
     @BeforeAll
     public static void initStore() {
         CrudRepository cr = new SimpleCrudRepository(new Main().sf());
+        HbmTaskRepository taskStore = new HbmTaskRepository(cr);
+        taskStore.truncateTable();
+
         store = new HbmUserRepository(cr);
         store.truncateTable();
     }
@@ -132,6 +135,7 @@ class HbmUserRepositoryTest {
 
         store.add(user);
         Optional<User> user2InDB = store.add(user2);
+        store.findAll().forEach(System.out::println);
         assertThat(user2InDB.isEmpty()).isTrue();
     }
 

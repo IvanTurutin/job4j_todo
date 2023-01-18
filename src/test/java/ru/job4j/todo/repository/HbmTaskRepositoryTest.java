@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.job4j.todo.Main;
+import ru.job4j.todo.model.Priority;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.model.User;
 
@@ -14,11 +15,12 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 
-@SpringBootTest
+/*@SpringBootTest*/
 class HbmTaskRepositoryTest {
 
     private static HbmTaskRepository store;
     private static User user;
+    private static Priority priority;
 
     @BeforeAll
     public static void initStore() {
@@ -34,6 +36,14 @@ class HbmTaskRepositoryTest {
         user.setLogin("login1");
         user.setPassword("pass1");
         userStore.add(user);
+
+        HbmPriorityRepository priorityRepository = new HbmPriorityRepository(cr);
+        priorityRepository.truncateTable();
+        priority = new Priority();
+        priority.setName("normal");
+        priority.setPosition(2);
+        priorityRepository.add(priority);
+
     }
 
     @AfterEach
@@ -50,6 +60,7 @@ class HbmTaskRepositoryTest {
         task.setCreated(LocalDateTime.now().withNano(0));
         task.setDone(false);
         task.setUser(user);
+        task.setPriority(priority);
 
         store.add(task);
         Optional<Task> taskInDB = store.findById(task.getId());
@@ -70,6 +81,7 @@ class HbmTaskRepositoryTest {
         task.setCreated(LocalDateTime.now().withNano(0));
         task.setDone(false);
         task.setUser(user);
+        task.setPriority(priority);
 
         Task task2 = new Task();
         task2.setId(0);
@@ -78,6 +90,7 @@ class HbmTaskRepositoryTest {
         task2.setCreated(LocalDateTime.now().withNano(0));
         task2.setDone(true);
         task2.setUser(user);
+        task2.setPriority(priority);
 
         store.add(task);
         store.add(task2);
@@ -95,6 +108,8 @@ class HbmTaskRepositoryTest {
         task.setCreated(LocalDateTime.now().withNano(0));
         task.setDone(false);
         task.setUser(user);
+        task.setPriority(priority);
+
 
         store.add(task);
         task.setDescription("new Task1 description");
@@ -118,6 +133,8 @@ class HbmTaskRepositoryTest {
         task.setCreated(LocalDateTime.now().withNano(0));
         task.setDone(false);
         task.setUser(user);
+        task.setPriority(priority);
+
 
         store.add(task);
         store.delete(task);
@@ -135,6 +152,8 @@ class HbmTaskRepositoryTest {
         task.setCreated(LocalDateTime.now().withNano(0));
         task.setDone(false);
         task.setUser(user);
+        task.setPriority(priority);
+
 
         store.add(task);
         task.setDone(true);
@@ -154,6 +173,8 @@ class HbmTaskRepositoryTest {
         task.setCreated(LocalDateTime.now().withNano(0));
         task.setDone(false);
         task.setUser(user);
+        task.setPriority(priority);
+
         Task task2 = new Task();
         task2.setId(0);
         task2.setName("Task2");
@@ -161,6 +182,7 @@ class HbmTaskRepositoryTest {
         task2.setCreated(LocalDateTime.now().withNano(0));
         task2.setDone(true);
         task2.setUser(user);
+        task2.setPriority(priority);
 
         store.add(task);
         store.add(task2);

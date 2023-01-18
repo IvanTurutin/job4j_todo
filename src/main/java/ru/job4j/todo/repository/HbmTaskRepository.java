@@ -22,22 +22,23 @@ public class HbmTaskRepository implements TaskRepository {
     public static final String ID = "fID";
     public static final String NAME = "fName";
     public static final String DESCRIPTION = "fDescription";
+    public static final String PRIORITY = "fPriority";
     public static final String UPDATE_DONE_STATEMENT = String.format(
             "UPDATE %s SET done = :%s WHERE id = :%s",
             MODEL, DONE, ID
     );
     public static final String UPDATE_STATEMENT = String.format(
-            "UPDATE %s SET name = :%s, description = :%s, done = :%s WHERE id = :%s",
-            MODEL, NAME, DESCRIPTION, DONE, ID
+            "UPDATE %s SET name = :%s, description = :%s, done = :%s, priority = :%s WHERE id = :%s",
+            MODEL, NAME, DESCRIPTION, DONE, PRIORITY, ID
     );
 
     public static final String DELETE_STATEMENT = String.format(
             "DELETE %s WHERE id = :%s",
             MODEL, ID
     );
-    public static final String FIND_ALL_STATEMENT = String.format("from %s", MODEL);
-    public static final String FIND_ALL_ORDER_BY_ID_STATEMENT = FIND_ALL_STATEMENT + " order by id";
-    public static final String FIND_BY_ID_STATEMENT = FIND_ALL_STATEMENT + String.format(" where id = :%s", ID);
+    public static final String FIND_ALL_STATEMENT = String.format("from %s t JOIN FETCH t.priority", MODEL);
+    public static final String FIND_ALL_ORDER_BY_ID_STATEMENT = FIND_ALL_STATEMENT + " order by t.id";
+    public static final String FIND_BY_ID_STATEMENT = FIND_ALL_STATEMENT + String.format(" where t.id = :%s", ID);
     public static final String FIND_BY_DONE_STATEMENT = FIND_ALL_STATEMENT + String.format(" where done = :%s", DONE);
     public static final String TRUNCATE_TABLE = String.format("DELETE FROM %s", MODEL);
 
@@ -90,6 +91,7 @@ public class HbmTaskRepository implements TaskRepository {
                         NAME, task.getName(),
                         DESCRIPTION, task.getDescription(),
                         DONE, task.isDone(),
+                        PRIORITY, task.getPriority(),
                         ID, task.getId()
                 )
         );

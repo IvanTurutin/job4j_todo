@@ -51,12 +51,20 @@
                             <span th:text="${task.name}"></span>
                         </h6>
                         <h6 class="card-subtitle mb-2">
+                            <span>Пользователь: </span>
+                            <span th:text="${task.user.name}"></span>
+                        </h6>
+                        <h6 class="card-subtitle mb-2">
                             <span>Описание: </span>
                             <span th:text="${task.description}"></span>
                         </h6>
                         <h6 class="card-subtitle mb-2">
                             <span>Время создания: </span>
                             <span th:text="${task.created}"></span>
+                        </h6>
+                        <h6 class="card-subtitle mb-2">
+                            <span>Приоритет: </span>
+                            <span th:text="${task.priority.position}"></span>
                         </h6>
                         <h6 class="card-subtitle mb-2">
                             <span>Статус: </span>

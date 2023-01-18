@@ -15,7 +15,7 @@ public interface TaskService {
      * @return задачу обернутую в Optional если добавление задачи прошло успешно, и Optional.empty() если добавить
      * задачу не удалось
      */
-    Optional<Task> add(Task task);
+    boolean add(Task task);
 
     /**
      * Обрабатывает запрос при поиске задачи по идентификатору

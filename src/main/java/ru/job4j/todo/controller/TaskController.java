@@ -1,11 +1,14 @@
 package ru.job4j.todo.controller;
 
+import lombok.AllArgsConstructor;
 import net.jcip.annotations.ThreadSafe;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.job4j.todo.model.Priority;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.model.User;
+import ru.job4j.todo.service.PriorityService;
 import ru.job4j.todo.service.TaskService;
 import ru.job4j.todo.util.ControllerUtility;
 
@@ -19,13 +22,12 @@ import java.util.Optional;
 @ThreadSafe
 @Controller
 @RequestMapping("/tasks")
+@AllArgsConstructor
 public class TaskController {
 
     private final TaskService taskService;
+    private final PriorityService priorityService;
 
-    public TaskController(TaskService taskService) {
-        this.taskService = taskService;
-    }
 
     /**
      * Производит подготовку для формирования вида, отображающего детальные сведения о задаче.
@@ -71,6 +73,7 @@ public class TaskController {
     @GetMapping("/new")
     public String newTask(HttpSession session, Model model) {
         model.addAttribute("user", ControllerUtility.checkUser(session));
+        model.addAttribute("priorities", priorityService.findAll());
         return "task/addNew";
     }
 
@@ -83,15 +86,23 @@ public class TaskController {
      * в случае успешного добавления задачи - перенаправляет на страницу, сообщающую о успешном добавлении задачи
      */
     @PostMapping("/add")
-    public String registration(HttpSession session, Model model, @ModelAttribute Task task) {
+    public String add(HttpSession session, Model model, @ModelAttribute Task task) {
         User user = ControllerUtility.checkUser(session);
         model.addAttribute("user", user);
         task.setUser(user);
-        Optional<Task> addedTask = taskService.add(task);
-        if (addedTask.isEmpty()) {
+
+        Optional<Priority> optPriority = priorityService.findById(task.getPriority().getId());
+        if (optPriority.isEmpty()) {
+            model.addAttribute("message", "Не удалось найти такой уровень приоритета.");
+            return "message/fail";
+        }
+        task.setPriority(optPriority.get());
+
+        if (!taskService.add(task)) {
             model.addAttribute("message", "Не удалось добавить новую задачу.");
             return "message/fail";
         }
+
         model.addAttribute("message", "Задача успешно добавлена.");
         return "message/success";
     }
@@ -107,6 +118,7 @@ public class TaskController {
     public String formUpdateTask(HttpSession session, Model model, @PathVariable("id") int id) {
         model.addAttribute("user", ControllerUtility.checkUser(session));
         model.addAttribute("task", taskService.findById(id));
+        model.addAttribute("priorities", priorityService.findAll());
         return "task/update";
     }
 
@@ -123,8 +135,15 @@ public class TaskController {
         User user = ControllerUtility.checkUser(session);
         model.addAttribute("user", user);
         task.setUser(user);
-        boolean updatedTask = taskService.update(task);
-        if (!updatedTask) {
+
+        Optional<Priority> optPriority = priorityService.findById(task.getPriority().getId());
+        if (optPriority.isEmpty()) {
+            model.addAttribute("message", "Не удалось найти такой уровень приоритета.");
+            return "message/fail";
+        }
+        task.setPriority(optPriority.get());
+
+        if (!taskService.update(task)) {
             model.addAttribute("message", "Не удалось обновить задачу.");
             return "message/fail";
         }
