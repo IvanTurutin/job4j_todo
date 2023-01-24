@@ -8,29 +8,26 @@ import lombok.ToString;
 import javax.persistence.*;
 
 /**
- * Модель данных приоритета
+ * Модель данных категории
  */
 @Entity
-@Table(name = "priorities")
+@Table(name = "categories")
 @Getter
 @Setter
 @ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Priority {
+public class Category {
     /**
-     * Идентификатор приоритета
+     * Идентификатор категории
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private int id;
+
     /**
-     * Имя приоритета
+     * Название категории
      */
     @Column(unique = true)
     private String name;
-    /**
-     * Позиция приоритета
-     */
-    private int position;
 }

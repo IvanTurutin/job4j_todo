@@ -50,6 +50,15 @@
                             <span>Задача: </span>
                             <span th:text="${task.name}"></span>
                         </h6>
+
+                        <h6 class="card-subtitle mb-2">
+                            <span>Категории: </span>
+                            <span th:each="category: ${task.categories}">
+                                <span th:text="${category.name}"></span>
+                                <span>, </span>
+                            </span>
+                        </h6>
+
                         <h6 class="card-subtitle mb-2">
                             <span>Пользователь: </span>
                             <span th:text="${task.user.name}"></span>

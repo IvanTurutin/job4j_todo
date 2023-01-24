@@ -5,9 +5,9 @@ import net.jcip.annotations.ThreadSafe;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import ru.job4j.todo.model.Priority;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.model.User;
+import ru.job4j.todo.service.CategoryService;
 import ru.job4j.todo.service.PriorityService;
 import ru.job4j.todo.service.TaskService;
 import ru.job4j.todo.util.ControllerUtility;
@@ -27,6 +27,7 @@ public class TaskController {
 
     private final TaskService taskService;
     private final PriorityService priorityService;
+    private final CategoryService categoryService;
 
 
     /**
@@ -74,6 +75,10 @@ public class TaskController {
     public String newTask(HttpSession session, Model model) {
         model.addAttribute("user", ControllerUtility.checkUser(session));
         model.addAttribute("priorities", priorityService.findAll());
+        model.addAttribute("categories", categoryService.findAll());
+/*
+        model.addAttribute("task", new Task());
+*/
         return "task/addNew";
     }
 
@@ -86,19 +91,12 @@ public class TaskController {
      * в случае успешного добавления задачи - перенаправляет на страницу, сообщающую о успешном добавлении задачи
      */
     @PostMapping("/add")
-    public String add(HttpSession session, Model model, @ModelAttribute Task task) {
+    public String add(HttpSession session, Model model, @ModelAttribute Task task, @RequestParam List<Integer> categoryList) {
         User user = ControllerUtility.checkUser(session);
         model.addAttribute("user", user);
         task.setUser(user);
 
-        Optional<Priority> optPriority = priorityService.findById(task.getPriority().getId());
-        if (optPriority.isEmpty()) {
-            model.addAttribute("message", "Не удалось найти такой уровень приоритета.");
-            return "message/fail";
-        }
-        task.setPriority(optPriority.get());
-
-        if (!taskService.add(task)) {
+        if (!taskService.add(task, categoryList)) {
             model.addAttribute("message", "Не удалось добавить новую задачу.");
             return "message/fail";
         }
@@ -119,6 +117,7 @@ public class TaskController {
         model.addAttribute("user", ControllerUtility.checkUser(session));
         model.addAttribute("task", taskService.findById(id));
         model.addAttribute("priorities", priorityService.findAll());
+        model.addAttribute("categories", categoryService.findAll());
         return "task/update";
     }
 
@@ -131,19 +130,12 @@ public class TaskController {
      * на страницу, сообщающую об успешном обновлении задачи
      */
     @PostMapping("/update")
-    public String updateTask(HttpSession session, Model model, @ModelAttribute Task task) {
+    public String updateTask(HttpSession session, Model model, @ModelAttribute Task task, @RequestParam List<Integer> categoryList) {
         User user = ControllerUtility.checkUser(session);
         model.addAttribute("user", user);
         task.setUser(user);
 
-        Optional<Priority> optPriority = priorityService.findById(task.getPriority().getId());
-        if (optPriority.isEmpty()) {
-            model.addAttribute("message", "Не удалось найти такой уровень приоритета.");
-            return "message/fail";
-        }
-        task.setPriority(optPriority.get());
-
-        if (!taskService.update(task)) {
+        if (!taskService.update(task, categoryList)) {
             model.addAttribute("message", "Не удалось обновить задачу.");
             return "message/fail";
         }

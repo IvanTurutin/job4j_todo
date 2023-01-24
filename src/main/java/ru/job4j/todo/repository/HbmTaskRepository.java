@@ -5,7 +5,10 @@ import net.jcip.annotations.ThreadSafe;
 import org.springframework.stereotype.Repository;
 import ru.job4j.todo.model.Task;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Репозиторий задач
@@ -23,6 +26,7 @@ public class HbmTaskRepository implements TaskRepository {
     public static final String NAME = "fName";
     public static final String DESCRIPTION = "fDescription";
     public static final String PRIORITY = "fPriority";
+    private  static final String TASKS = "fTasks";
     public static final String UPDATE_DONE_STATEMENT = String.format(
             "UPDATE %s SET done = :%s WHERE id = :%s",
             MODEL, DONE, ID
@@ -36,7 +40,14 @@ public class HbmTaskRepository implements TaskRepository {
             "DELETE %s WHERE id = :%s",
             MODEL, ID
     );
-    public static final String FIND_ALL_STATEMENT = String.format("from %s t JOIN FETCH t.priority", MODEL);
+    public static final String FIND_ALL_STATEMENT = String.format(
+            "select distinct t from %s t JOIN FETCH t.priority JOIN FETCH t.categories",
+            MODEL
+    );
+    public static final String FIND_ALL_FROM_LIST_STATEMENT = String.format(
+            "from %s t JOIN FETCH t.categories where t in :%s",
+            MODEL, TASKS
+    );
     public static final String FIND_ALL_ORDER_BY_ID_STATEMENT = FIND_ALL_STATEMENT + " order by t.id";
     public static final String FIND_BY_ID_STATEMENT = FIND_ALL_STATEMENT + String.format(" where t.id = :%s", ID);
     public static final String FIND_BY_DONE_STATEMENT = FIND_ALL_STATEMENT + String.format(" where done = :%s", DONE);
@@ -50,9 +61,7 @@ public class HbmTaskRepository implements TaskRepository {
      */
     @Override
     public Optional<Task> add(Task task) {
-        int id = task.getId();
-        cr.run(session -> session.persist(task));
-        return id == task.getId() ? Optional.empty() : Optional.of(task);
+        return cr.run(session -> session.persist(task)) ? Optional.of(task) : Optional.empty();
     }
 
     /**
@@ -84,17 +93,7 @@ public class HbmTaskRepository implements TaskRepository {
      */
     @Override
     public boolean update(Task task) {
-
-        return  cr.query(
-                UPDATE_STATEMENT,
-                Map.of(
-                        NAME, task.getName(),
-                        DESCRIPTION, task.getDescription(),
-                        DONE, task.isDone(),
-                        PRIORITY, task.getPriority(),
-                        ID, task.getId()
-                )
-        );
+        return cr.run(session -> session.merge(task));
     }
 
     /**
@@ -119,7 +118,6 @@ public class HbmTaskRepository implements TaskRepository {
      */
     @Override
     public boolean updateDone(Task task) {
-
         return cr.query(
                 UPDATE_DONE_STATEMENT,
                 Map.of(
@@ -137,7 +135,6 @@ public class HbmTaskRepository implements TaskRepository {
      */
     @Override
     public List<Task> findByDone(boolean isDone) {
-
         return cr.query(
                 FIND_BY_DONE_STATEMENT,
                 Task.class,

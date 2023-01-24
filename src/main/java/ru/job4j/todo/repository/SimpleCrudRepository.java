@@ -23,16 +23,19 @@ public class SimpleCrudRepository implements CrudRepository {
     private static final String LOG_MESSAGE = "Exception in SimpleCrudRepository";
 
     @Override
-    public void run(Consumer<Session> command) {
+    public boolean run(Consumer<Session> command) {
+        boolean rslt = false;
         try {
             tx(session -> {
                         command.accept(session);
                         return null;
                     }
             );
+            rslt = true;
         } catch (Exception e) {
             LOG.error(LOG_MESSAGE, e);
         }
+        return rslt;
     }
 
     @Override

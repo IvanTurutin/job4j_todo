@@ -1,10 +1,16 @@
 package ru.job4j.todo.service;
 
+import lombok.AllArgsConstructor;
 import net.jcip.annotations.ThreadSafe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import ru.job4j.todo.model.Category;
+import ru.job4j.todo.model.Priority;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.repository.TaskRepository;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,13 +19,13 @@ import java.util.Optional;
  */
 @ThreadSafe
 @Service
+@AllArgsConstructor
 public class SimpleTaskService implements TaskService {
 
     private final TaskRepository repository;
-
-    public SimpleTaskService(TaskRepository repository) {
-        this.repository = repository;
-    }
+    private final CategoryService categoryService;
+    private final PriorityService priorityService;
+    private final static Logger LOG = LoggerFactory.getLogger(SimpleTaskService.class.getName());
 
     /**
      * Обрабатывает запрос при добавлении задачи в репозиторий
@@ -29,7 +35,41 @@ public class SimpleTaskService implements TaskService {
      */
     @Override
     public boolean add(Task task) {
+        if (task.getName().isEmpty()) {
+            task.setName("Not specified");
+        }
         return repository.add(task).isPresent();
+    }
+
+    @Override
+    public boolean add(Task task, List<Integer> categoryIds) {
+        if (!checkCategory(task, categoryIds) || !checkPriority(task)) {
+            return false;
+        }
+        return add(task);
+    }
+
+    private boolean checkCategory(Task task, List<Integer> categoryIds) {
+        List<Category> categories = categoryIds.stream().map(id -> {
+            Category cat = new Category();
+            cat.setId(id);
+            return cat;
+        }).toList();
+        if (!new HashSet<>(categoryService.allPresent(categoryIds)).containsAll(categories)) {
+            LOG.warn("Не удалось найти все указаные категории.");
+            return false;
+        }
+        task.setCategories(categories);
+        return true;
+    }
+
+    private boolean checkPriority(Task task) {
+        Optional<Priority> optPriority = priorityService.findById(task.getPriority().getId());
+        if (optPriority.isEmpty()) {
+            LOG.warn("Не удалось найти такой уровень приоритета.");
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -62,6 +102,14 @@ public class SimpleTaskService implements TaskService {
             return false;
         }
         return repository.update(task);
+    }
+
+    @Override
+    public boolean update(Task task, List<Integer> categoryIds) {
+        if (!checkCategory(task, categoryIds) || !checkPriority(task)) {
+            return false;
+        }
+        return update(task);
     }
 
     /**

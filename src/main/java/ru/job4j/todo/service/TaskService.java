@@ -18,6 +18,15 @@ public interface TaskService {
     boolean add(Task task);
 
     /**
+     * Производит добавление задачи, при этом производится проверка наличия в базе данных приоритета и
+     * категорий указанных в задаче
+     * @param task задача для добавления
+     * @param categoryIds список категорий
+     * @return true если задача успешно добавлена, false если задача не добавлена
+     */
+    boolean add(Task task, List<Integer> categoryIds);
+
+    /**
      * Обрабатывает запрос при поиске задачи по идентификатору
      * @param id идентификатор задачи
      * @return задачу обернутую в Optional если задача найдена, и Optional.empty() если не найдена
@@ -36,6 +45,15 @@ public interface TaskService {
      * @return true если задача обновлена, false если не обновлена
      */
     boolean update(Task task);
+
+    /**
+     * Производит обновление задачи, при этом производится проверка наличия в базе данных приоритета и
+     * категорий указанных в задаче
+     * @param task задача для добавления
+     * @param categoryIds список категорий
+     * @return true если задача успешно обновлена, false если задача не обновлена
+     */
+    boolean update(Task task, List<Integer> categoryIds);
 
     /**
      * Обрабатывает запрос при удалении задачи

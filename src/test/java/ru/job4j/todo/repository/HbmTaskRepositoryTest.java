@@ -3,13 +3,14 @@ package ru.job4j.todo.repository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import ru.job4j.todo.Main;
+import ru.job4j.todo.model.Category;
 import ru.job4j.todo.model.Priority;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.model.User;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +22,7 @@ class HbmTaskRepositoryTest {
     private static HbmTaskRepository store;
     private static User user;
     private static Priority priority;
+    private static List<Category> categories;
 
     @BeforeAll
     public static void initStore() {
@@ -44,6 +46,18 @@ class HbmTaskRepositoryTest {
         priority.setPosition(2);
         priorityRepository.add(priority);
 
+        HbmCategoryRepository categoryRepository = new HbmCategoryRepository(cr);
+        categoryRepository.truncateTable();
+        categories = new ArrayList<>();
+        Category category = new Category();
+        category.setName("category1");
+        Category category2 = new Category();
+        category2.setName("category2");
+        categories.add(category);
+        categories.add(category2);
+        categoryRepository.add(category);
+        categoryRepository.add(category2);
+
     }
 
     @AfterEach
@@ -61,6 +75,7 @@ class HbmTaskRepositoryTest {
         task.setDone(false);
         task.setUser(user);
         task.setPriority(priority);
+        task.setCategories(categories);
 
         store.add(task);
         Optional<Task> taskInDB = store.findById(task.getId());
@@ -82,6 +97,7 @@ class HbmTaskRepositoryTest {
         task.setDone(false);
         task.setUser(user);
         task.setPriority(priority);
+        task.setCategories(categories);
 
         Task task2 = new Task();
         task2.setId(0);
@@ -91,10 +107,12 @@ class HbmTaskRepositoryTest {
         task2.setDone(true);
         task2.setUser(user);
         task2.setPriority(priority);
+        task2.setCategories(categories);
 
         store.add(task);
         store.add(task2);
         List<Task> tasks = store.findAll();
+        tasks.stream().forEach(System.out::println);
         assertThat(tasks).isNotEmpty().hasSize(2).contains(task, task2);
 
     }
@@ -109,7 +127,7 @@ class HbmTaskRepositoryTest {
         task.setDone(false);
         task.setUser(user);
         task.setPriority(priority);
-
+        task.setCategories(categories);
 
         store.add(task);
         task.setDescription("new Task1 description");
@@ -134,7 +152,7 @@ class HbmTaskRepositoryTest {
         task.setDone(false);
         task.setUser(user);
         task.setPriority(priority);
-
+        task.setCategories(categories);
 
         store.add(task);
         store.delete(task);
@@ -153,7 +171,7 @@ class HbmTaskRepositoryTest {
         task.setDone(false);
         task.setUser(user);
         task.setPriority(priority);
-
+        task.setCategories(categories);
 
         store.add(task);
         task.setDone(true);
@@ -174,6 +192,7 @@ class HbmTaskRepositoryTest {
         task.setDone(false);
         task.setUser(user);
         task.setPriority(priority);
+        task.setCategories(categories);
 
         Task task2 = new Task();
         task2.setId(0);
@@ -183,6 +202,7 @@ class HbmTaskRepositoryTest {
         task2.setDone(true);
         task2.setUser(user);
         task2.setPriority(priority);
+        task2.setCategories(categories);
 
         store.add(task);
         store.add(task2);

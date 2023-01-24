@@ -10,7 +10,7 @@ import java.util.function.Function;
 
 public interface CrudRepository {
 
-    void run(Consumer<Session> command);
+    boolean run(Consumer<Session> command);
 
     void run(String query, Map<String, Object> args);
 
