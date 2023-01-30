@@ -33,12 +33,20 @@ public class User {
     /**
      * Логин пользователя
      */
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String login;
 
     /**
      * Пароль пользователя
      */
+    @Column(nullable = false)
     private String password;
+
+    /**
+     * Временная зона пользователя
+     */
+    @ManyToOne
+    @JoinColumn(name = "timezone_id")
+    private TimeZone timeZone;
 
 }

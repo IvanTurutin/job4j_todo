@@ -4,6 +4,7 @@ import net.jcip.annotations.ThreadSafe;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.TaskService;
 import ru.job4j.todo.util.ControllerUtility;
 
@@ -30,7 +31,7 @@ public class IndexController {
     @GetMapping("/index")
     public String index(Model model, HttpSession session) {
         model.addAttribute("user", ControllerUtility.checkUser(session));
-        model.addAttribute("tasks", taskService.findAll());
+        model.addAttribute("tasks", taskService.findAll((User) session.getAttribute("user")));
         return "index";
     }
 

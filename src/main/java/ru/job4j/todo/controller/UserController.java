@@ -1,10 +1,12 @@
 package ru.job4j.todo.controller;
 
+import lombok.AllArgsConstructor;
 import net.jcip.annotations.ThreadSafe;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.job4j.todo.model.User;
+import ru.job4j.todo.service.TimeZoneService;
 import ru.job4j.todo.service.UserService;
 import ru.job4j.todo.util.ControllerUtility;
 
@@ -15,12 +17,10 @@ import java.util.Optional;
 @ThreadSafe
 @Controller
 @RequestMapping("/users")
+@AllArgsConstructor
 public class UserController {
     private final UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+    private final TimeZoneService timeZoneService;
 
     /**
      * Принимает запрос на отображение вида добавления пользователя
@@ -31,6 +31,7 @@ public class UserController {
     @GetMapping("/formAdd")
     public String addUser(Model model, HttpSession session) {
         model.addAttribute("user", ControllerUtility.checkUser(session));
+        model.addAttribute("timeZones", timeZoneService.findAll());
         return "user/add";
     }
 
@@ -52,6 +53,42 @@ public class UserController {
         model.addAttribute("message", "Пользователь успешно зарегистрирован.");
         return "message/success";
     }
+
+    /**
+     * Принимает запрос на отображение вида добавления пользователя
+     * @param model модель вида
+     * @param session сессия подключения
+     * @return назнвание шаблона вида добавления пользователя
+     */
+    @GetMapping("/formEdit")
+    public String formEdit(Model model, HttpSession session) {
+        model.addAttribute("user", ControllerUtility.checkUser(session));
+        model.addAttribute("timeZones", timeZoneService.findAll());
+        return "user/update";
+    }
+
+    /**
+     * Производит добавление пользователя в систему
+     * @param user сформированный объект на основе введенных пользователем данных
+     * @param session сессия подключения
+     * @return перенаправляет на страницу /successRegistration при успешной регистрации,
+     * и на страницу /failRegistration при неудачной регистрации
+     */
+    @PostMapping("/edit")
+    public String edit(HttpSession session, Model model, @ModelAttribute User user) {
+        model.addAttribute("user", ControllerUtility.checkUser(session));
+        Optional<User> userOptional = userService.update(user);
+        if (userOptional.isEmpty()) {
+            model.addAttribute("message", "Данные пользователя не обновлены");
+            return "message/fail";
+        }
+        session.setAttribute("user", userOptional.get());
+        model.addAttribute("user", ControllerUtility.checkUser(session));
+        model.addAttribute("message", "Данные пользователя обновлены.");
+        return "message/success";
+    }
+
+
 
     /**
      * Принимает запрос на отображение вида авторизации пользователя

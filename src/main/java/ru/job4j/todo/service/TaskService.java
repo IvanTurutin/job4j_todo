@@ -1,6 +1,7 @@
 package ru.job4j.todo.service;
 
 import ru.job4j.todo.model.Task;
+import ru.job4j.todo.model.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,10 +35,28 @@ public interface TaskService {
     Optional<Task> findById(int id);
 
     /**
+     * Обрабатывает запрос при поиске задачи по идентификатору и устанавливает часовой пояс, соответствующий
+     * пользовательским настройкам
+     * @param id идентификатор задачи
+     * @param user пользователь
+     * @return задачу обернутую в Optional если задача найдена, и Optional.empty() если не найдена
+     */
+    Optional<Task> findById(int id, User user);
+
+    /**
      * Обрабатывает запрос при поиске всех задач
      * @return список всех найденных задач
      */
     List<Task> findAll();
+
+    /**
+     * Обрабатывает запрос при поиске всех задач и устанавливает часовой пояс, соответствующий пользовательским
+     * настройкам
+     * @param user пользователь
+     * @return список всех найденных задач
+     */
+    List<Task> findAll(User user);
+
 
     /**
      * Обрабатывает запрос при изменении задачи

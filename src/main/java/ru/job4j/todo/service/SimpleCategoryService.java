@@ -40,8 +40,7 @@ public class SimpleCategoryService implements CategoryService {
     @Override
     public boolean delete(int id) {
         Optional<Category> optionalCategory = repository.findById(id);
-        optionalCategory.ifPresent(repository::delete);
-        return optionalCategory.isPresent();
+        return optionalCategory.isPresent() && repository.delete(optionalCategory.get()).isPresent();
     }
 
     @Override

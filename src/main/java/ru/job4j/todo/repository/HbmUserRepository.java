@@ -27,10 +27,6 @@ public class HbmUserRepository implements UserRepository {
     public static final String LOGIN = "fLogin";
     public static final String PASSWORD = "fPassword";
 
-    public static final String UPDATE_STATEMENT = String.format(
-            "UPDATE %s SET name = :%s, login = :%s, password = :%s WHERE id = :%s",
-            MODEL, NAME, LOGIN, PASSWORD, ID
-    );
     public static final String FIND_ALL_STATEMENT = String.format("from %s", MODEL);
     private static final String FIND_BY_LOGIN_AND_PASSWORD_STATEMENT = FIND_ALL_STATEMENT
             + String.format(" WHERE login = :%s AND password = :%s",  LOGIN, PASSWORD);
@@ -72,15 +68,7 @@ public class HbmUserRepository implements UserRepository {
      */
     @Override
     public boolean update(User user) {
-        return  cr.query(
-                UPDATE_STATEMENT,
-                Map.of(
-                        NAME, user.getName(),
-                        LOGIN, user.getLogin(),
-                        PASSWORD, user.getPassword(),
-                        ID, user.getId()
-                )
-        );
+        return cr.run(session -> session.merge(user));
     }
 
     /**

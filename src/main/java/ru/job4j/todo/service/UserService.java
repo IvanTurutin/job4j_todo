@@ -29,7 +29,7 @@ public interface UserService {
      * @param user объект пользователя, который нужно обновить
      * @return Optional с обновленным пользователем, или Optional.empty() если пользователь не был обновлен.
      */
-    boolean update(User user);
+    Optional<User> update(User user);
 
     /**
      * Обрабатывает поиск пользователя по почте и паролю

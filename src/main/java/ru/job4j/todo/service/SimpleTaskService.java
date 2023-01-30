@@ -8,11 +8,14 @@ import org.springframework.stereotype.Service;
 import ru.job4j.todo.model.Category;
 import ru.job4j.todo.model.Priority;
 import ru.job4j.todo.model.Task;
+import ru.job4j.todo.model.User;
 import ru.job4j.todo.repository.TaskRepository;
 
+import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
 
 /**
  * Сервисный слой задач
@@ -82,6 +85,17 @@ public class SimpleTaskService implements TaskService {
         return repository.findById(id);
     }
 
+    @Override
+    public Optional<Task> findById(int id, User user) {
+        Optional<Task> task = findById(id);
+        if (user.getTimeZone() != null) {
+            task.ifPresent(t -> setTimeZone(t, user.getTimeZone().getZoneId()));
+        } else {
+            task.ifPresent(this::setDefaultTimeZone);
+        }
+        return task;
+    }
+
     /**
      * Обрабатывает запрос при поиске всех задач
      * @return список всех найденных задач
@@ -89,6 +103,32 @@ public class SimpleTaskService implements TaskService {
     @Override
     public List<Task> findAll() {
         return repository.findAll();
+    }
+
+    @Override
+    public List<Task> findAll(User user) {
+        List<Task> tasks = findAll();
+        if (user.getTimeZone() != null) {
+            tasks.forEach(t -> setTimeZone(t, user.getTimeZone().getZoneId()));
+        } else {
+            tasks.forEach(this::setDefaultTimeZone);
+        }
+        return tasks;
+    }
+
+    private void setTimeZone(Task task, String zoneId) {
+        task.setCreated(
+                task.getCreated().atZone(
+                                ZoneId.of(TimeZone.getDefault().toZoneId().getId()))
+                        .withZoneSameInstant(ZoneId.of(zoneId))
+                        .toLocalDateTime()
+        );
+    }
+
+    private void setDefaultTimeZone(Task task) {
+        task.setCreated(
+                task.getCreated().atZone(TimeZone.getDefault().toZoneId()).toLocalDateTime()
+        );
     }
 
     /**
@@ -120,8 +160,7 @@ public class SimpleTaskService implements TaskService {
     @Override
     public boolean delete(int id) {
         Optional<Task> optionalTask = repository.findById(id);
-        optionalTask.ifPresent(repository::delete);
-        return optionalTask.isPresent();
+        return optionalTask.isPresent() && repository.delete(optionalTask.get()).isPresent();
     }
 
     /**

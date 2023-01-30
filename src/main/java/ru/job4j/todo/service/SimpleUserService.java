@@ -29,8 +29,8 @@ public class SimpleUserService implements UserService {
     }
 
     @Override
-    public boolean update(User user) {
-        return repository.update(user);
+    public Optional<User> update(User user) {
+        return repository.update(user) ? findById(user.getId()) : Optional.empty();
     }
 
     @Override

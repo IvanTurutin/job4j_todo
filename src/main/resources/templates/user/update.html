@@ -26,7 +26,7 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-item nav-link" th:href="@{/index}">Главная</a>
+                <a class="nav-item nav-link active" href="#">Редактирование профиля<span class="sr-only">(current)</span></a>
                 <li class="nav-item dropdown" th:if="${user.name == 'Гость'}" >
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span th:text="${user.name}"></span>
@@ -54,67 +54,42 @@
 
                     </div>
                 </li>
+
             </div>
         </div>
     </nav>
-    <div class="row pt-3">
+    <div class="row">
         <div class="card" style="width: 100%">
             <div class="card-header">
-                Информация о задаче.
+                Редактирование профиля.
             </div>
             <div class="card-body">
-                <form th:action="@{|/tasks/formUpdate/${task.id}|}">
+                <form th:action="@{/users/edit}" method="POST" th:object="${user}">
+                    <input type="hidden" name="id" value="id" th:field="*{id}"/>
                     <div class="form-group">
-                        <h6 class="card-subtitle mb-2">
-                            <span>Задача: </span>
-                            <span th:text="${task.name}"></span>
-                        </h6>
-
-                        <h6 class="card-subtitle mb-2">
-                            <span>Категории: </span>
-                            <span th:each="category: ${task.categories}">
-                                <span th:text="${category.name}"></span>
-                                <span>, </span>
-                            </span>
-                        </h6>
-
-                        <h6 class="card-subtitle mb-2">
-                            <span>Пользователь: </span>
-                            <span th:text="${task.user.name}"></span>
-                        </h6>
-                        <h6 class="card-subtitle mb-2">
-                            <span>Описание: </span>
-                            <span th:text="${task.description}"></span>
-                        </h6>
-                        <h6 class="card-subtitle mb-2">
-                            <span>Время создания: </span>
-                            <span th:text="${#temporals.format(task.created, 'dd-MM-EE-yyyy HH:mm:ss')}"></span>
-                        </h6>
-                        <h6 class="card-subtitle mb-2">
-                            <span>Приоритет: </span>
-                            <span th:text="${task.priority.position}"></span>
-                        </h6>
-                        <h6 class="card-subtitle mb-2">
-                            <span>Статус: </span>
-                            <span th:if="${task.done}">
-                                Выполнена
-                            </span>
-                            <span th:if="${!task.done}">
-                                Не выполнена
-                            </span>
-                        </h6>
+                        <label for="name">Имя пользователя</label>
+                        <input type="text" class="form-control" id="name" name="name" th:field="*{name}">
                     </div>
-                    <button type="submit" class="btn btn-primary">Редактировать</button>
-                </form>
-            </div>
-            <div class="card-body">
-                <form th:action="@{|/tasks/isDone/${task.id}|}" method="POST">
-                    <button type="submit" class="btn btn-primary">Задача выполнена</button>
-                </form>
-            </div>
-            <div class="card-body" >
-                <form th:action="@{|/tasks/delete/${task.id}|}" method="POST">
-                    <button type="submit" class="btn btn-primary">Удалить задачу</button>
+
+                    <div class="form-group">
+                        <label for="password">Пароль</label>
+                        <input type="password" class="form-control" id="password" name="password" th:field="*{password}">
+                        <small id="password-help" class="form-text text-muted">
+                            Пароль должен быть длиной 8-20 символов, содержать буквы и цифры
+                            и не должен содержать пробелов.
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label for="login">Логин</label>
+                        <input type="text" class="form-control" id="login" name="login" th:field="*{login}">
+                    </div>
+                    <div class="form-group">
+                        <label for="timeZone.id">Часовой пояс</label>
+                        <select class="form-control" id="timeZone.id" name="timeZone.id">
+                            <option th:each="timeZone : ${timeZones}" th:value="${timeZone.id}" th:text="${timeZone.zoneId}" th:selected="${timeZone.id == user.timeZone.id}"></option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Обновить</button>
                 </form>
             </div>
         </div>

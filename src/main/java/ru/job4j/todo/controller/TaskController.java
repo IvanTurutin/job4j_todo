@@ -41,7 +41,7 @@ public class TaskController {
     @GetMapping("/formShow/{id}")
     public String formShowSession(Model model, HttpSession session, @PathVariable("id") int id) {
         model.addAttribute("user", ControllerUtility.checkUser(session));
-        Optional<Task> task = taskService.findById(id);
+        Optional<Task> task = taskService.findById(id, (User) session.getAttribute("user"));
         if (task.isEmpty()) {
             model.addAttribute("message", "Такая задача не найдена.");
             return "message/fail";
@@ -95,7 +95,6 @@ public class TaskController {
         User user = ControllerUtility.checkUser(session);
         model.addAttribute("user", user);
         task.setUser(user);
-
         if (!taskService.add(task, categoryList)) {
             model.addAttribute("message", "Не удалось добавить новую задачу.");
             return "message/fail";

@@ -27,14 +27,33 @@
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
                 <a class="nav-item nav-link active" href="#">Регистрация<span class="sr-only">(current)</span></a>
-                <a class="nav-item nav-link" th:if="${user.name == 'Гость'}" th:href="@{/users/loginPage}">
-                    <span th:text="${user.name}"></span>
-                    <span> | Войти</span>
-                </a>
-                <a class="nav-item nav-link" th:if="${user.name != 'Гость'}" th:href="@{/users/logout}">
-                    <span th:text="${user.name}"></span>
-                    <span> | Выйти</span>
-                </a>
+                <li class="nav-item dropdown" th:if="${user.name == 'Гость'}" >
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span th:text="${user.name}"></span>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" th:href="@{/users/loginPage}">
+                            <span>Войти</span>
+                        </a>
+                        <a class="dropdown-item" th:href="@{/users/formAdd}">
+                            <span>Зарегистрироваться</span>
+                        </a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown" th:if="${user.name != 'Гость'}" >
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span th:text="${user.name}"></span>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" th:href="@{/users/formEdit}">
+                            <span>Редактировать профиль</span>
+                        </a>
+                        <a class="dropdown-item" th:href="@{/users/logout}">
+                            <span>Выйти</span>
+                        </a>
+
+                    </div>
+                </li>
 
             </div>
         </div>
@@ -63,6 +82,12 @@
                     <div class="form-group">
                         <label for="login">Логин</label>
                         <input type="text" class="form-control" id="login" name="login" placeholder="Введите логин">
+                    </div>
+                    <div class="form-group">
+                        <label for="timeZone.id">Часовой пояс</label>
+                        <select class="form-control" id="timeZone.id" name="timeZone.id">
+                            <option th:each="timeZone, itemStat : ${timeZones}" th:value="${timeZone.id}" th:text="${timeZone.zoneId}"></option>
+                        </select>
                     </div>
                     <button type="submit" class="btn btn-primary">Зарегистрировать</button>
                 </form>
